@@ -40,20 +40,19 @@ def chat():
   data = request.json
   thread_id = data.get('thread_id')
   user_input = data.get('message', '')
-  # if not thread_id:
-  #   print("Error: Missing thread_id in /chat")
-  #   return jsonify({"error": "Missing thread_id"}), 400
-  # print("Received message for thread ID:", thread_id, "Message:", user_input)
+  if not thread_id:
+    print("Error: Missing thread_id in /chat")
+    return jsonify({"error": "Missing thread_id"}), 400
+  print("Received message for thread ID:", thread_id, "Message:", user_input)
 
-  # # Start run and send run ID back to ManyChat
-  # client.beta.threads.messages.create(thread_id=thread_id,
-  #                                     role="user",
-  #                                     content=user_input)
-  # run = client.beta.threads.runs.create(thread_id=thread_id,
-  #                                       assistant_id=ASSISTANT_ID)
-  # print("Run started with ID:", run.id)
-  return jsonify({"run_id": "test"})
-  # return jsonify({"run_id": run.id})
+  # Start run and send run ID back to ManyChat
+  client.beta.threads.messages.create(thread_id=thread_id,
+                                      role="user",
+                                      content=user_input)
+  run = client.beta.threads.runs.create(thread_id=thread_id,
+                                        assistant_id=ASSISTANT_ID)
+  print("Run started with ID:", run.id)
+  return jsonify({"run_id": run.id})
 
 
 
