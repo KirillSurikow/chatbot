@@ -54,6 +54,56 @@ def chat():
   print("Run started with ID:", run.id)
   return jsonify({"run_id": run.id})
 
+@app.route('/check', methods=['POST'])
+def check_run_status():
+  data = request.json
+  thread_id = data.get('thread_id')
+  run_id = data.get('run_id')
+  if not thread_id or not run_id:
+    print("Error: Missing thread_id or run_id in /check")
+    return jsonify({"response": "error"})
+
+  # Start timer ensuring no more than 9 seconds, ManyChat timeout is 10s
+  start_time = time.time()
+  while time.time() - start_time < 9:
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
+                                                   run_id=run_id)
+    print("Checking run status:", run_status.status)
+
+    if run_status.status == 'completed':
+      messages = client.beta.threads.messages.list(thread_id=thread_id)
+      message_content = messages.data[0].content[0].text
+      # Remove annotations
+      annotations = message_content.annotations
+      for annotation in annotations:
+        message_content.value = message_content.value.replace(
+            annotation.text, '')
+      print("Run completed, returning response")
+      return jsonify({
+          "response": message_content.value,
+          "status": "completed"
+      })
+
+    # if run_status.status == 'requires_action':
+    #   print("Action in progress...")
+    #   # Handle the function call
+    #   for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
+    #     if tool_call.function.name == "create_lead":
+    #       # Process lead creation
+    #       arguments = json.loads(tool_call.function.arguments)
+    #       output = functions.create_lead(arguments["name"], arguments["phone"])
+    #       client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+    #                                                    run_id=run_id,
+    #                                                    tool_outputs=[{
+    #                                                        "tool_call_id":
+    #                                                        tool_call.id,
+    #                                                        "output":
+    #                                                        json.dumps(output)
+    #                                                    }])
+    time.sleep(1)
+
+  print("Run timed out")
+  return jsonify({"response": "timeout"})
 
 
 
