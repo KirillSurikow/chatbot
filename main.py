@@ -56,6 +56,7 @@ def chat():
 
 @app.route('/check', methods=['POST'])
 def check_run_status():
+  print('checking')
   data = request.json
   thread_id = data.get('thread_id')
   run_id = data.get('run_id')
