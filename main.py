@@ -52,7 +52,7 @@ def chat():
   # run = client.beta.threads.runs.create(thread_id=thread_id,
   #                                       assistant_id=ASSISTANT_ID)
   # print("Run started with ID:", run.id)
-  return jsonify({"run_id": test})
+  return jsonify({"run_id": "test"})
   # return jsonify({"run_id": run.id})
 
 
