@@ -12,7 +12,7 @@ from packaging import version
 
 # load_dotenv()
 
-
+OPENAI_API_KEY = os.getenv('OPEN_AI_KEY')
 required_version = version.parse("1.1.1")
 current_version = version.parse(openai.__version__)
 
